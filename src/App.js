@@ -36,30 +36,30 @@ export default function App() {
     const { username, email, phone, dob } = formData;
 
     // Step-by-step validation per field to match Cypress tests
-    if (!username) {
-      alert("Please fill all fields.");
-      return;
-    }
-    if (!email) {
-      alert("Please fill all fields.");
-      return;
-    }
+    // if (!username) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
+    // if (!email) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
     if (!email.includes("@")) {
       alert("Invalid email. Please check your email address.");
       return;
     }
-    if (!phone) {
-      alert("Please fill all fields.");
-      return;
-    }
+    // if (!phone) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
     if (!/^\d{10}$/.test(phone)) {
       alert("Invalid phone number. Please enter a 10-digit phone number.");
       return;
     }
-    if (!dob) {
-      alert("Please fill all fields.");
-      return;
-    }
+    // if (!dob) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
     const today = new Date().toISOString().split("T")[0];
     if (dob > today) {
       alert("Invalid date of birth");
