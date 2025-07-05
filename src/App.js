@@ -30,44 +30,55 @@ export default function App() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
-
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     const { username, email, phone, dob } = formData;
-
-    // Step-by-step validation per field to match Cypress tests
-    if (!username) {
-      alert("Please fill all fields.");
-      return;
-    }
-    if (!email) {
-      alert("Please fill all fields.");
-      return;
-    }
+    console.log(validateEmail(email));
     if (!email.includes("@")) {
       alert("Invalid email. Please check your email address.");
       return;
     }
-    if (!phone) {
-      alert("Please fill all fields.");
-      return;
-    }
+
+    // Step-by-step validation per field to match Cypress tests
+    // if (!username) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
+    // if (!email) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
+    // if (!email.includes("@")) {
+    //   alert("Invalid email. Please check your email address.");
+    //   return;
+    // }
+    // if (!phone) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
     if (!/^\d{10}$/.test(phone)) {
-      alert("Invalid phone number");
+      alert("Invalid phone number.Please enter a 10-digit phone number");
       return;
     }
-    if (!dob) {
-      alert("Please fill all fields.");
-      return;
-    }
+    // if (!dob) {
+    //   alert("Please fill all fields.");
+    //   return;
+    // }
     const today = new Date().toISOString().split("T")[0];
     if (dob > today) {
-      alert("Invalid date of birth");
+      alert("Invalid date of birth.Date of birth cannot be in the future.");
       return;
     }
 
     // All validations passed
-    setShowModal(false);
+    setShowModal(true);
     setFormData({ username: "", email: "", phone: "", dob: "" });
   };
 
@@ -87,6 +98,7 @@ export default function App() {
                   id="username"
                   value={formData.username}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <div>
@@ -96,6 +108,7 @@ export default function App() {
                   id="email"
                   value={formData.email}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <div>
@@ -105,6 +118,7 @@ export default function App() {
                   id="phone"
                   value={formData.phone}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <div>
@@ -114,6 +128,7 @@ export default function App() {
                   id="dob"
                   value={formData.dob}
                   onChange={handleChange}
+                  required
                 />
               </div>
               <button type="submit" className="submit-button">
