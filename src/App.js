@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import "./styles.css";
-
 export default function App() {
-  const [showModal, setShowModal] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -10,108 +9,142 @@ export default function App() {
     dob: "",
   });
 
-  const modalRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        showModal &&
-        modalRef.current &&
-        !modalRef.current.contains(e.target)
-      ) {
-        setShowModal(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showModal]);
-
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [id]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default browser validation behavior
+
     const { username, email, phone, dob } = formData;
 
-    // Manual empty field validation
-    if (!username || !email || !phone || !dob) {
-      alert("Please fill all fields.");
+    // Get form element to check HTML5 validity
+    const form = e.target;
+    const isValid = form.checkValidity();
+
+    // Trigger browser validation UI
+    form.reportValidity();
+
+    if (!isValid) return; // Stop if basic validations fail
+
+    // Validate phone number (ensure exactly 10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(phone)) {
+      alert("Invalid phone number. Please enter a 10-digit phone number.");
       return;
     }
 
-    // Phone validation - must be exactly 10 digits
-    if (!/^\d{10}$/.test(phone)) {
-      alert("Invalid phone number");
-      return;
-    }
-
-    // DOB validation - must not be in the future
+    // Validate date of birth (must not be in future)
     const today = new Date();
-    const inputDate = new Date(dob);
-    if (inputDate > today) {
-      alert("Invalid date of birth");
+    const selectedDate = new Date(dob);
+    if (selectedDate > today) {
+      alert("Invalid date of birth. Please enter a valid past date.");
       return;
     }
 
-    // All validations passed
-    setShowModal(false);
-    setFormData({ username: "", email: "", phone: "", dob: "" });
+    // Reset form values but keep modal open
+    setFormData({
+      username: "",
+      email: "",
+      phone: "",
+      dob: "",
+    });
+  };
+
+  const openModal = () => {
+    setIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const handleClickOutside = (e) => {
+    if (e.target.classList.contains("modal")) {
+      closeModal();
+    }
   };
 
   return (
-    <div className="app" id="root">
-      {!showModal && (
-        <button onClick={() => setShowModal(true)}>Open Form</button>
-      )}
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content" ref={modalRef}>
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label>Username:</label>
-                <input
-                  type="text"
-                  id="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Phone:</label>
-                <input
-                  type="text"
-                  id="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  pattern="\d{10}"
-                  title="Please enter exactly 10 digits"
-                />
-              </div>
-              <div>
-                <label>Date of Birth:</label>
-                <input
-                  type="date"
-                  id="dob"
-                  value={formData.dob}
-                  onChange={handleChange}
-                  required
-                  max={new Date().toISOString().split("T")[0]}
-                />
-              </div>
-              <button type="submit" className="submit-button">
+    <div>
+      {/* Open Form Button */}
+      <button
+        onClick={openModal}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        Open Form
+      </button>
+
+      {/* Modal */}
+      {isOpen && (
+        <div className="modal" onClick={handleClickOutside}>
+          <div className="modal-content">
+            <h2>Fill Details</h2>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} noValidate>
+              {/* Username */}
+              <label htmlFor="username">Username:</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                minLength={3}
+                title="Username must be at least 3 characters long."
+              />
+
+              {/* Email */}
+              <label htmlFor="email">Email Address:</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                title="Please enter a valid email address."
+              />
+
+              {/* Phone Number */}
+              <label htmlFor="phone">Phone Number:</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                pattern="\d*"
+                title="Please enter a 10-digit phone number."
+              />
+
+              {/* Date of Birth */}
+              <label htmlFor="dob">Date of Birth:</label>
+              <input
+                type="date"
+                id="dob"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                required
+              />
+
+              {/* Submit Button */}
+              <button className="submit-button" type="submit">
                 Submit
               </button>
             </form>
