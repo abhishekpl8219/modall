@@ -32,7 +32,13 @@ export default function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { phone, dob } = formData;
+    const { username, email, phone, dob } = formData;
+
+    // Manual empty field validation
+    if (!username || !email || !phone || !dob) {
+      alert("Please fill all fields.");
+      return;
+    }
 
     // Phone validation - must be exactly 10 digits
     if (!/^\d{10}$/.test(phone)) {
@@ -40,7 +46,7 @@ export default function App() {
       return;
     }
 
-    // Date of birth validation - must not be in the future
+    // DOB validation - must not be in the future
     const today = new Date();
     const inputDate = new Date(dob);
     if (inputDate > today) {
@@ -49,7 +55,7 @@ export default function App() {
     }
 
     // All validations passed
-    setShowModal(false); // Close the form modal on successful submission
+    setShowModal(false);
     setFormData({ username: "", email: "", phone: "", dob: "" });
   };
 
